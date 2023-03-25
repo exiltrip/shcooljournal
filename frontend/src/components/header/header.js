@@ -3,7 +3,7 @@ import './header.sass';
 import {NavLink} from "react-router-dom";
 
 
-const Header = () => {
+const Header = (props) => {
     return (
         <header>
             <nav className="navbar navbar-dark navbar-expand-lg bg-dark bg-body-tertiary"  data-bs-theme="dark">
@@ -27,17 +27,28 @@ const Header = () => {
                             <li className="nav-item">
                                 <NavLink className="nav-link" to="/events">Мероприятия</NavLink>
                             </li>
+                            <div className="d-flex navbar-nav account">
                             <li className="nav-item dropdown">
                                 <NavLink className="nav-link dropdown-toggle" to="/profile" role="button" data-bs-toggle="dropdown"
                                    aria-expanded="false">
                                     Профиль
                                 </NavLink>
-                                <ul className="dropdown-menu dropdown-menu-dark">
-                                    <li><NavLink className="dropdown-item" to="/profile">Личный кабинет</NavLink></li>
-                                    <li><NavLink className="dropdown-item" to="/perfomance">Успеваемость</NavLink></li>
-                                    <li><NavLink className="dropdown-item" to="/achievements">Личные достижения</NavLink></li>
-                                </ul>
+                                {
+                                    props.isLoggedIn ?
+                                        (<ul className="dropdown-menu dropdown-menu-dark">
+                                            <li><NavLink className="dropdown-item" to="/profile">Личный кабинет</NavLink>
+                                            </li>
+                                            <li><NavLink className="dropdown-item" to="/perfomance">Успеваемость</NavLink>
+                                            </li>
+                                            <li><NavLink className="dropdown-item" to="/achievements">Личные
+                                                достижения</NavLink></li>
+                                        </ul>)
+                                        : (<ul className="dropdown-menu dropdown-menu-dark">
+                                            <li><NavLink className="dropdown-item" to="/login">Войти</NavLink></li>
+                                        </ul>)
+                                }
                             </li>
+                            </div>
                         </ul>
                     </div>
                 </div>
