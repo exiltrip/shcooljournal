@@ -1,8 +1,7 @@
-import React from 'react'
+import React, {useState} from 'react'
 import styled from 'styled-components'
-import { useTable } from 'react-table'
-
-import makeData from './makeData'
+import axios from "axios";
+import {useEffect} from "react";
 
 const Styles = styled.div`
 
@@ -33,80 +32,45 @@ const Styles = styled.div`
   }
 `
 
-function Table({ columns, data }) {
-    // Use the state and functions returned from useTable to build your UI
-    const {
-        getTableProps,
-        getTableBodyProps,
-        headerGroups,
-        rows,
-        prepareRow,
-    } = useTable({
-        columns,
-        data,
-    })
 
-    // Render the UI for your table
-    return (
-        <table {...getTableProps()}>
-            <thead>
-            {headerGroups.map(headerGroup => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map(column => (
-                        <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-                    ))}
-                </tr>
-            ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
-            {rows.map((row, i) => {
-                prepareRow(row)
-                return (
-                    <tr {...row.getRowProps()}>
-                        {row.cells.map(cell => {
-                            return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                        })}
-                    </tr>
-                )
-            })}
-            </tbody>
-        </table>
-    )
-}
 
-function ScheduleTable() {
-    const columns = React.useMemo(
-        () => [
-            {
-                Header: 'Дата',
-                accessor: 'date',
-            },
-            {
-                Header: 'Время начала',
-                accessor: 'lsnStart',
-            },
-            {
-                Header: 'Время окончания',
-                accessor: 'lsnEnd',
-            },
-            {
-                Header: 'Предмет',
-                accessor: 'lsn',
-            },
-            {
-                Header: 'Аудитория',
-                accessor: 'classroom',
-            },
+function ScheduleTable(props) {
 
-        ],
-        []
-    )
-
-    const data = React.useMemo(() => makeData(20), [])
+    const [data, setData] = useState([])
+    const getData = () => {
+        axios.get(`http://185.130.44.124:8000/pair/all?search=${props.id}`)
+            .then(res => {
+                setData(res.data.results)
+            })
+    }
+    useEffect(() =>{
+        getData()
+    }, [])
 
     return (
         <Styles>
-            <Table columns={columns} data={data} />
+            <div className="schedule-container">
+
+                <table className="scheduleTable" >
+                    <thead>
+                    <th>дата</th>
+                    <th>предмет</th>
+                    <th>аудитория</th>
+                    <th>группа</th>
+                    <th>преподаватель</th>
+                    </thead>
+                    {data.map(aud =>
+                    <tbody>
+                     <th>{aud.start_time} - {aud.end_time}</th>
+                     <th>{aud.group_id.name}</th>
+                     <th>{aud.audit_id.name}</th>
+                     <th>{aud.group_id.name}</th>
+                     <th>{aud.teacher_id.first_name} {aud.teacher_id.last_name}</th>
+                    </tbody>
+                     )}
+
+                </table>
+            </div>
         </Styles>
     )
 }

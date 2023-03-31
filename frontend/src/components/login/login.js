@@ -3,15 +3,15 @@ import './login.sass'
 import axios from "axios";
 import {useNavigate} from "react-router";
 import {NavLink} from "react-router-dom";
-
+import jwt_decode from 'jwt-decode'
 const Login = (props) => {
     const [userData, setUserData] = useState([]);
 
     localStorage.clear();
 
-    const [email, setEmail] = useState();
+    const [username, setEmail] = useState();
     const [password, setPassword] = useState();
-    const [emailError, setEmailError] = useState('e-mail cannot be empty!');
+    const [emailError, setEmailError] = useState('login cannot be empty!');
     const [passwordError, setPasswordError] = useState('password cannot be empty!');
 
     const [emailDirty, setEmailDirty] = useState(false);
@@ -41,15 +41,12 @@ const Login = (props) => {
 
     const emailHandler = (e) => {
         setEmail(e.target.value)
-        const re =
-            /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-        if (!re.test(String(e.target.value).toLowerCase())) {
-            setEmailError('incorrect e-mail')
+        if (e.target.value.length < 1) {
+            setEmailError('the login is too short!')
             if(!e.target.value){
-                setEmailError('e-mail cannot be empty!')
+                setEmailError('login cannot be empty!')
             }
-        }
-        else{
+        }else{
             setEmailError("")
         }
     }
@@ -78,33 +75,21 @@ const Login = (props) => {
         event.preventDefault();
         axios({
             method: "post",
-            url: "http://localhost:8080/api/token",
-            data: {email, password},
-            headers: { "Content-Type": "multipart/form-data" },
+            url: "http://185.130.44.124:8000/user/login/",
+            data: {username, password}
         })
             .then(res => {
                 console.log(res);
                 console.log(res.data);
                 setEmail('');
                 setPassword('');
-                localStorage.setItem('token', res.data.access_token);
-                navigate(`../schedule`, { replace: true });
-                props.logIn()
-                const userToken = localStorage.getItem('token');
+                localStorage.setItem('token', res.data.access);
+                localStorage.setItem('refresh', res.data.refresh);
+                localStorage.setItem('isAdmin', res.data.is_super_user);
 
-                const requireUserData = () => axios.get(
-                    `http://localhost:8080/api/users/me`,
-                    {
-                        headers: {"Authorization" : `Bearer ${userToken}`}
-                    })
-                    .then(res => {
-                        console.log(res.data);
-                        setUserData(res.data);
-                        localStorage.setItem('userEmail', res.data.email);
-                        localStorage.setItem('userName', res.data.name);
-                        localStorage.setItem('userSurname', res.data.surname);
-                    })
-                requireUserData();
+                navigate(`../searchSchedule`, { replace: true });
+                props.logIn()
+
 
             })
             .catch(function (error) {
@@ -118,9 +103,9 @@ const Login = (props) => {
             <div className="main-login">
                 <form className="px-4 py-3">
                     <div className="mb-3">
-                        <label  className="form-label ">E-mail</label>
+                        <label  className="form-label ">login</label>
                         {(emailDirty && emailError) && <div className="error" style={{color: "red"}}>{emailError}</div>}
-                        <input onChange={e => emailHandler(e) && handleChangeEmail} value={email} onBlur={e => blurHandler(e)} name="email" type="email" className="form-control form-control-lg" placeholder="email@example.com"/>
+                        <input onChange={e => emailHandler(e) && handleChangeEmail} value={username} onBlur={e => blurHandler(e)} name="email" type="email" className="form-control form-control-lg" placeholder="login"/>
                     </div>
                     <div className="mb-3">
                         <label htmlFor="exampleDropdownFormPassword1" className="form-label">Password</label>

@@ -1,14 +1,14 @@
 import React from 'react';
 import './header.sass';
 import {NavLink} from "react-router-dom";
-
+import logo from '../../assets/favicon.ico'
 
 const Header = (props) => {
     return (
         <header>
             <nav className="navbar navbar-dark navbar-expand-lg bg-dark bg-body-tertiary"  data-bs-theme="dark">
                 <div className="container-fluid">
-                    <NavLink className="navbar-brand" to="/" >Logo</NavLink>
+                    <NavLink className="navbar-brand" to="/" ><img src={logo} alt="" className="logo"/></NavLink>
 
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false"
@@ -22,10 +22,7 @@ const Header = (props) => {
                                 <NavLink className="nav-link active" aria-current="page" to="/">Главная</NavLink>
                             </li>
                             <li className="nav-item">
-                                <NavLink className="nav-link" to="/schedule">Расписание</NavLink>
-                            </li>
-                            <li className="nav-item">
-                                <NavLink className="nav-link" to="/events">Мероприятия</NavLink>
+                                <NavLink className="nav-link" to="/searchSchedule">Расписание</NavLink>
                             </li>
                             <div className="d-flex navbar-nav account">
                             <li className="nav-item dropdown">
@@ -36,12 +33,16 @@ const Header = (props) => {
                                 {
                                     props.isLoggedIn ?
                                         (<ul className="dropdown-menu dropdown-menu-dark">
-                                            <li><NavLink className="dropdown-item" to="/profile">Личный кабинет</NavLink>
+                                            <li><NavLink className="dropdown-item" to="/profile" onClick={props.logOut}>выйти</NavLink>
                                             </li>
-                                            <li><NavLink className="dropdown-item" to="/perfomance">Успеваемость</NavLink>
-                                            </li>
-                                            <li><NavLink className="dropdown-item" to="/achievements">Личные
-                                                достижения</NavLink></li>
+                                            {
+                                                props.isAdmin ?
+                                                    (<>
+                                                        <li><NavLink className="dropdown-item" to="/scheduleEdit">изменение расписания</NavLink></li>
+                                                        <li><NavLink className="dropdown-item" to="/groupedit">изменение групп</NavLink></li>
+                                                     </>)
+                                                    : ""
+                                            }
                                         </ul>)
                                         : (<ul className="dropdown-menu dropdown-menu-dark">
                                             <li><NavLink className="dropdown-item" to="/login">Войти</NavLink></li>
