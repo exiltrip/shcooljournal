@@ -17,4 +17,6 @@
 
 `pm2 npm run build`
 
+`pm2 serve -s build`
+
 `pm2 save`
