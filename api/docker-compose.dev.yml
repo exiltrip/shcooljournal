@@ -1,0 +1,42 @@
+version: '3.9'
+
+
+services:
+
+  pg_school_service:
+    container_name: 'pg_school_service'
+    image: 'postgres:${POSTGRES_VERSION}'
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - $HOME/postgresql/data:/var/lib/postgresql/data/
+    ports:
+      - '${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}'
+
+  redis_school_service:
+    container_name: 'redis_school_service'
+    image: 'redis:${REDIS_VERSION}'
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - '${REDIS_PORT}:${REDIS_PORT}'
+
+
+  central_school_service:
+    container_name: 'central_school_service'
+    build:
+      dockerfile: central_service/Dockerfile
+      context: central_service
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./central_service:/usr/src/app
+    links:
+      - pg_school_service
+      - redis_school_service
+
+    ports:
+      - '${APPLICATION_PORT}:${APPLICATION_PORT}'
